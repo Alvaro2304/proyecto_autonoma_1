@@ -7,7 +7,6 @@ import numpy as np
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
 from cv_bridge import CvBridge
-from matplotlib import pyplot as plt
 
 can_detection = 0
 
@@ -31,7 +30,6 @@ if __name__ == '__main__':
 
   # Objeto que se suscribe al tópico de la cámara
   topic_name = "/camera/rgb/image_raw"
-  # topic_name = "/usb_cam/image_raw"
   cam = Cam(topic_name)
 
   # Tópico para publicar una imagen de salida
@@ -50,45 +48,38 @@ if __name__ == '__main__':
     
     # Obtener la imagen del tópico de ROS en formato de OpenCV
     I = cam.get_image()
-    
     # Realizar algún tipo de procesamiento sobre la imagen
-    
-    if len(I.shape) == 3 and I.shape[2] == 3:
-      img_hsv = cv2.cvtColor(I,cv2.COLOR_BGR2HSV)
+    if I.ndim==3:
+      hsv=cv2.cvtColor(I,cv2.COLOR_BGR2HSV)
+      #cv2.imshow("HSV",hsv)
+      lower = np.array([160,100,20])
+      upper = np.array([179,255,255])
 
-      #Filtrado de color rojo
-      lower1 = np.array([0, 25, 20])
-      upper1 = np.array([10, 255, 255])
-
-      lower2 = np.array([160,50,20])
-      upper2 = np.array([179,255,255])
-
-      lower_mask = cv2.inRange(img_hsv, lower1, upper1)
-      upper_mask = cv2.inRange(img_hsv, lower2, upper2)
-
-      full_mask = lower_mask + upper_mask
-
-      #kernel de operador morfologico
-      kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
-      #Operador morfologico para eliminar ruido
-      full_mask_2 = cv2.morphologyEx(full_mask, cv2.MORPH_OPEN, kernel)
-
-      #Deteccion de contorno
-      contours, hierarchy = cv2.findContours(full_mask_2, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-
-      if len(contours) > 0:
-        max_cont = max(contours, key=cv2.contourArea)
-        x,y,w,h = cv2.boundingRect(max_cont)
-        cv2.rectangle(I, (x,y), (x+w, y+h), (0,255,0), 1)
+      mask = cv2.inRange(hsv, lower, upper)
+      kernel = np.ones((5,5),np.uint8)
+      mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+      mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+      #cv2.imshow("MASK",mask)
+      cont,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+      #cont_img=cv2.drawContours(I,cont,-1,255,3)
+      #cv2.imshow("Bordes",cont_img)
+      if len(cont)>0:
+        c=max(cont,key=cv2.contourArea,default=0)
+        x,y,h,w=cv2.boundingRect(c)
+        cv2.rectangle(I,(x,y),(x+w,y+w),(0,255,0),1)
         can_detection = 1
-      cv2.imshow('Can detector',I)
+      cv2.imshow("GAA", I)
       
-
+      # segmented_img = cv2.bitwise_and(I, I, mask=mask)
+      # cv2.imshow("Segmented_image",segmented_img)
     else:
-      can_detection = 0
+      can_detection=0
     pubflag.publish(can_detection)
+      
     # Mostrar la imagen
-    # cv2.imshow("Imagen Camara Turtlebot3", I)
+    #cv2.imshow("Imagen Camara Turtlebot3", I)
+    
+
     # Esperar al bucle para actualizar
     cv2.waitKey(1)
     # Opcional: publicar la imagen de salida como tópico de ROS
