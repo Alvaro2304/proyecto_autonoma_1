@@ -11,7 +11,6 @@ class Pose_pub(object):
         topic = "amcl_pose"
         self.pub = rospy.Subscriber(topic,PoseWithCovarianceStamped,self.callback)
         self.position = PoseWithCovarianceStamped()
-        rospy.sleep(1)
     
     def callback(self, msg):
         # Callback para el suscriptor
@@ -23,13 +22,17 @@ class Pose_pub(object):
 class Detection(object):
     def __init__(self):
         topic_sub = 'detection'
+        self.detection=False
         fsub = rospy.Subscriber(topic_sub,Bool,self.callback)
-        self.can_detection = Bool()
-        rospy.sleep(1)
+        #self.can_detection = Bool()
+        #rospy.sleep(1)
     
 
     def callback(self,msg):
-      self.detection = msg
+        self.detection = msg
+    
+    def get_detection(self):
+        return self.detection
 
 if __name__ == "__main__":
    rospy.init_node("Pose_publisher")
@@ -52,9 +55,9 @@ if __name__ == "__main__":
    while not rospy.is_shutdown():
     px,py,pz = pose.get_pos()
 
-    if detection:
+    if detection.get_detection:
        fxact.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+'\n')
-
+    #    break
     t+=dt
     rate.sleep()
 
