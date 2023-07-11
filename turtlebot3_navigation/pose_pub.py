@@ -22,7 +22,7 @@ class Pose_pub(object):
 class Detection(object):
     def __init__(self):
         topic_sub = 'detection'
-        self.detection=False
+        self.detection=Bool()
         fsub = rospy.Subscriber(topic_sub,Bool,self.callback)
         #self.can_detection = Bool()
         #rospy.sleep(1)
@@ -54,10 +54,16 @@ if __name__ == "__main__":
    t = 0
    while not rospy.is_shutdown():
     px,py,pz = pose.get_pos()
-
-    if detection.get_detection:
-       fxact.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+'\n')
+    detect = detection.detection.data
+    if detect:
+        fxact.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+' '+str(1)+'\n')
+    else:
+        fxact.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+' '+str(0)+'\n')
+    # detect = detection.detection
+    # if detect:
+    #    fxact.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+'\n')
     #    break
+    print(detect)
     t+=dt
     rate.sleep()
 
