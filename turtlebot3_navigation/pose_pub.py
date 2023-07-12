@@ -38,7 +38,8 @@ if __name__ == "__main__":
    rospy.init_node("Pose_publisher")
    #Cambiar segun direccion
    
-   fxact = open("/home/palero/catkin_ws/src/turtlebot3/turtlebot3/poses_pub/pos_actual.txt", "w")
+   fxact = open("/home/user/catkin_ws/src/turtlebot3/turtlebot3/poses_pub/pos_actual.txt", "w")
+   fxcan= open("/home/user/catkin_ws/src/turtlebot3/turtlebot3/poses_pub/pos_can.txt", "w")
    topic = 'Rob_Position'
    
    pub = rospy.Publisher(topic,String,queue_size=10)
@@ -57,12 +58,15 @@ if __name__ == "__main__":
     detect = detection.detection.data
     if detect:
         fxact.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+' '+str(1)+'\n')
-#    else:
-#        fxact.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+' '+str(0)+'\n')
+        fxcan.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+' '+str(1)+'\n')  
+    else:
+        fxact.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+' '+str(0)+'\n')
+    
     # detect = detection.detection
     # if detect:
     #    fxact.write(str(t)+' '+str(px)+' '+str(py)+' '+str(pz)+'\n')
     #    break
+
     print(detect)
     t+=dt
     rate.sleep()
