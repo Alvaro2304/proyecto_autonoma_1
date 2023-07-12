@@ -58,15 +58,24 @@ if __name__ == '__main__':
     if I.ndim==3:
       hsv=cv2.cvtColor(I,cv2.COLOR_BGR2HSV)
       #cv2.imshow("HSV",hsv)
-      lower = np.array([160,100,20])
-      upper = np.array([179,255,255])
-
-      mask = cv2.inRange(hsv, lower, upper)
+    # lower boundary RED color range values; Hue (0 - 10)
+      lower1 = np.array([0, 100, 20])
+      upper1 = np.array([5, 255, 255])
+      
+      # upper boundary RED color range values; Hue (160 - 180)
+      lower2 = np.array([165,100,20])
+      upper2 = np.array([179,255,255])
+      
+      lower_mask = cv2.inRange(hsv, lower1, upper1)
+      upper_mask = cv2.inRange(hsv, lower2, upper2)
+      
+      full_mask = lower_mask + upper_mask
       kernel = np.ones((5,5),np.uint8)
-      mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-      mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+      mask = cv2.morphologyEx(full_mask, cv2.MORPH_CLOSE, kernel)
+      mask = cv2.morphologyEx(full_mask, cv2.MORPH_OPEN, kernel)
       #cv2.imshow("MASK",mask)
-      cont,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+
+      cont,_=cv2.findContours(full_mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
       #cont_img=cv2.drawContours(I,cont,-1,255,3)
       #cv2.imshow("Bordes",cont_img)
       print("-------------------------------------")
@@ -110,5 +119,5 @@ if __name__ == '__main__':
     # Opcional: publicar la imagen de salida como tópico de ROS
     pubimg.publish(cam.bridge.cv2_to_imgmsg(I))
     rate.sleep()
-
+cv2.imwrite("detection.png",I)
 cv2.destroyAllWindows()

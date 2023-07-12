@@ -38,8 +38,8 @@ if __name__ == "__main__":
    rospy.init_node("Pose_publisher")
    #Cambiar segun direccion
    
-   fxact = open("/home/user/catkin_ws/src/turtlebot3/turtlebot3/poses_pub/pos_actual.txt", "w")
-   fxcan= open("/home/user/catkin_ws/src/turtlebot3/turtlebot3/poses_pub/pos_can.txt", "w")
+   fxact = open("/home/utec/catkin_ws/src/turtlebot3/turtlebot3/poses_pub/pos_actual.txt", "w")
+   fxcan= open("/home/utec/catkin_ws/src/turtlebot3/turtlebot3/poses_pub/pos_can.txt", "w")
    topic = 'Rob_Position'
    
    pub = rospy.Publisher(topic,String,queue_size=10)
