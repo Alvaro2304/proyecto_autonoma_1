@@ -14,7 +14,7 @@ class Cam(object):
   def __init__(self, topic_name="camera_frame"):
     self.bridge = CvBridge()
     self.image = np.zeros((10,10))
-    isub = rospy.Subscriber(topic_name, Image, self.image_callback)
+    self.isub = rospy.Subscriber(topic_name, Image, self.image_callback)
 
   def image_callback(self, img):
     self.image = self.bridge.imgmsg_to_cv2(img, "bgr8")
@@ -43,6 +43,12 @@ if __name__ == '__main__':
   # Frecuencia del bucle principal
   freq = 10
   rate = rospy.Rate(freq)
+  flag_send= 0
+  flag_send_last=0
+  can_detection=0
+  print(flag_send)
+  print(flag_send_last)
+  print(can_detection)
   # Bucle principal
   while not rospy.is_shutdown():
     
@@ -63,14 +69,32 @@ if __name__ == '__main__':
       cont,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
       #cont_img=cv2.drawContours(I,cont,-1,255,3)
       #cv2.imshow("Bordes",cont_img)
+      print("-------------------------------------")
+      print("antes",flag_send,",",flag_send_last)
+      
       if len(cont)>0:
         c=max(cont,key=cv2.contourArea,default=0)
         x,y,h,w=cv2.boundingRect(c)
-        cv2.rectangle(I,(x,y),(x+w,y+w),(0,255,0),1)
-        can_detection = 1
+        cv2.rectangle(I,(x,y),(x+w,y+w),(0,255,0),5)
+        flag_send=1        
       else:
+        flag_send=0
+        
+    
+      print("despues",flag_send,",",flag_send_last)
+      if(flag_send==1):
+          if(flag_send_last==0): 
+            can_detection = 1
+          else:
+            can_detection=0
+      else: 
         can_detection=0
-      cv2.imshow("GAA", I)
+      print("can",can_detection)
+    
+     
+      flag_send_last=flag_send
+      print("cambio",flag_send,",",flag_send_last)
+      #cv2.imshow("GAA", I)
       
       # segmented_img = cv2.bitwise_and(I, I, mask=mask)
       # cv2.imshow("Segmented_image",segmented_img)
@@ -84,7 +108,7 @@ if __name__ == '__main__':
     # Esperar al bucle para actualizar
     cv2.waitKey(1)
     # Opcional: publicar la imagen de salida como tópico de ROS
-    #pubimg.publish(cam.bridge.cv2_to_imgmsg(I))
+    pubimg.publish(cam.bridge.cv2_to_imgmsg(I))
     rate.sleep()
 
 cv2.destroyAllWindows()

@@ -8,6 +8,6 @@ booleano=data[:,4]
 for i in range(len(booleano)):
     if booleano[i]==1:
         plt.plot(-y[i], x[i],'.r')
-    else:
-        plt.plot(-y[i], x[i],'.b')
+#    else:
+#        plt.plot(-y[i], x[i],'.b')
 plt.show()
