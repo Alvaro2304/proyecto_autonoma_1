@@ -1,2 +1,2 @@
 # Proyecto de Robotica Autonoma 2023-2
-ptmre soy huevon causa, avancé el proyecto en la carpeta del turtlebot y ahora se hace git push en la carpeta "turtlebot3" y en la carpeta "turtlebot3_simulations". Tendrás que hacer pull dos veces, y asegurate que el remote version tenga el mismo link que este repositorio. ¡Y DALE U!
+Project fot the "Autonomoud Robotics" course. We used turtlebot3 for the simulation. The goal was to sending waypoints to the robot and if it sees a can, it would save this position. We have used AMCL and Dynamic Window Approach (DWA) for the navigation.
